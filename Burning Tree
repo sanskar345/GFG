@@ -1,0 +1,83 @@
+class Solution {
+    Node* createMapping(Node* root, int target, map<Node*, Node*> &map){
+        Node* targetNode = NULL;
+
+        queue<Node*> q;
+        q.push(root);
+        map[root] = NULL;
+
+        while(!q.empty()){
+            Node* front = q.front();
+            q.pop();
+
+            if(front->data == target){
+                targetNode = front;
+            }
+
+            if(front->left){
+                map[front->left] = front;
+                q.push(front->left);
+            }
+            if(front->right){
+                map[front->right] = front;
+                q.push(front->right);
+            }
+        }
+
+        return targetNode;
+    }
+
+    int solve(Node* target, map<Node*, Node*> &nodeToParent){
+        map<Node*, bool> visited;
+
+        visited[target] = true;
+
+        queue<Node*> q;
+        q.push(target);
+        int time = 0;
+
+        while(!q.empty()){
+            bool flag = false;
+            int size = q.size();
+            for(int i=0; i<size; i++){
+                Node* temp = q.front();
+                q.pop();
+                if(temp->left && !visited[temp->left]){
+                    visited[temp->left] = true;
+                    q.push(temp->left);
+                    flag = true;
+                }
+                if(temp->right && !visited[temp->right]){
+                    visited[temp->right] = true;
+                    q.push(temp->right);
+                    flag = true;
+                }
+                if(nodeToParent[temp] && !visited[nodeToParent[temp]]){
+                    visited[nodeToParent[temp]] = true;
+                    flag = true;
+                    q.push(nodeToParent[temp]);
+                }
+            }
+
+            if(flag){
+                time++;
+            }
+        }
+
+        return time;
+    }
+  public:
+    int minTime(Node* root, int target)
+    {
+        // Your code goes here
+        // 1. Get the target node and create node to parent mapping
+
+        map<Node*, Node*> map;
+
+        Node* targetNode = createMapping(root, target, map);
+
+        // 2. count time and burn tree
+
+        return solve(targetNode, map);
+    }
+};
